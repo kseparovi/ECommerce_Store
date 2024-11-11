@@ -13,7 +13,7 @@
 	<script type="text/javascript">
 		var user = '{{request.user}}'
 
-		function getToken(name) { <!-- This function retrieves the CSRF token from the cookie --> 
+		function getToken(name) { <!-- This function retrieves the CSRF token from the cookie -->
 		    var cookieValue = null;
 		    if (document.cookie && document.cookie !== '') {
 		        var cookies = document.cookie.split(';');
@@ -29,7 +29,7 @@
 		    return cookieValue;
 		}
 		var csrftoken = getToken('csrftoken')
-	
+
 	</script>
 
 </head>
@@ -46,11 +46,11 @@
 	      <li class="nav-item active">
 	        <a class="nav-link" href="{% url 'store' %}">Store <span class="sr-only">(current)</span></a>
 	      </li>
-	 
+
 	    </ul>
 	    <div class="form-inline my-2 my-lg-0">
 	     	<a href="#"class="btn btn-warning">Login</a>
-	     	
+
 	     	<a href="{% url 'cart' %}">
 	    		<img  id="cart-icon" src="{% static 'images/cart.png' %}">
 	    	</a>

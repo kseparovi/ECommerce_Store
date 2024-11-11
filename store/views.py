@@ -65,7 +65,7 @@ def updateItem(request):
 
 	orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
 
-	if action == 'add':
+	if action == 'add': # This is the action that is being sent from the javascript to the backend. add or remove are the only two actions that can be sent
 		orderItem.quantity = (orderItem.quantity + 1)
 	elif action == 'remove':
 		orderItem.quantity = (orderItem.quantity - 1)
