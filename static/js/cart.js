@@ -8,8 +8,7 @@ for (i = 0; i < updateBtns.length; i++) {
 		console.log('USER:', user)
 
 		if (user == 'AnonymousUser'){
-			console.log('User is not authenticated')
-
+			addCookieItem(productId, action)
 		}else{
 			updateUserOrder(productId, action)
 		}
@@ -21,7 +20,7 @@ function updateUserOrder(productId, action){
 
 		var url = '/update_item/'
 
-		fetch(url, { //fetch is a promise based function that allows us to make requests to the server and handle the response
+		fetch(url, {
 			method:'POST',
 			headers:{
 				'Content-Type':'application/json',
@@ -30,10 +29,35 @@ function updateUserOrder(productId, action){
 			body:JSON.stringify({'productId':productId, 'action':action})
 		})
 		.then((response) => {
-		   return response.json(); //json is a method that returns a promise that resolves with the result of parsing the body text as JSON
+		   return response.json();
 		})
 		.then((data) => {
-		    console.log('Data:', data)
-			location.reload()
+		    location.reload()
 		});
+}
+
+function addCookieItem(productId, action){ //function to add items to cart when user is not authenticated (cookie)
+	console.log('User is not authenticated')
+
+	if (action == 'add'){
+		if (cart[productId] == undefined){
+		cart[productId] = {'quantity':1}
+
+		}else{
+			cart[productId]['quantity'] += 1
+		}
+	}
+
+	if (action == 'remove'){
+		cart[productId]['quantity'] -= 1
+
+		if (cart[productId]['quantity'] <= 0){
+			console.log('Item should be deleted')
+			delete cart[productId];
+		}
+	}
+	console.log('CART:', cart)
+	document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+
+	location.reload()
 }

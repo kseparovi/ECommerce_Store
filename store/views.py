@@ -77,21 +77,21 @@ def updateItem(request):
 
 	return JsonResponse('Item was added', safe=False)
 
-def processOrder(request):
+def processOrder(request): # This function is used to process the order
 	transaction_id = datetime.datetime.now().timestamp()
 	data = json.loads(request.body)
 
-	if request.user.is_authenticated:
+	if request.user.is_authenticated: # If the user is authenticated, then we will get the customer and order details
 		customer = request.user.customer
 		order, created = Order.objects.get_or_create(customer=customer, complete=False)
 		total = float(data['form']['total'])
 		order.transaction_id = transaction_id
 
-		if total == order.get_cart_total:
+		if total == order.get_cart_total: # If the total amount is equal to the cart total, then we will mark the order as complete
 			order.complete = True
 		order.save()
 
-		if order.shipping == True:
+		if order.shipping == True: # If the shipping is true, then we will create a shipping address
 			ShippingAddress.objects.create(
 			customer=customer,
 			order=order,
@@ -104,3 +104,6 @@ def processOrder(request):
 		print('User is not logged in')
 
 	return JsonResponse('Payment submitted..', safe=False)
+	# We will return a JSON response with the message "Payment submitted".
+	# JSONResponse is used to return a JSON response from the view.
+	# The safe parameter is set to False, which means that any object can be passed to the JsonResponse.
