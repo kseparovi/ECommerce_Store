@@ -3,6 +3,7 @@ from django.http import JsonResponse
 import json
 import datetime
 from .models import *
+from .utils import cookieCart
 
 def store(request):
 
@@ -12,10 +13,10 @@ def store(request):
 		items = order.orderitem_set.all()
 		cartItems = order.get_cart_items
 	else:
-		#Create empty cart for now for non-logged in user
-		items = []
-		order = {'get_cart_total':0, 'get_cart_items':0, 'shipping':False}
-		cartItems = order['get_cart_items']
+		cookieData = cookieCart(request)
+		cartItems = cookieData['cartItems']
+		order = cookieData['order']
+		items = cookieData['items']
 
 	products = Product.objects.all()
 	context = {'products':products, 'cartItems':cartItems}
@@ -29,10 +30,10 @@ def cart(request):
 		items = order.orderitem_set.all()
 		cartItems = order.get_cart_items
 	else:
-		#Create empty cart for now for non-logged in user
-		items = []
-		order = {'get_cart_total':0, 'get_cart_items':0, 'shipping':False}
-		cartItems = order['get_cart_items']
+		cookieData = cookieCart(request)
+		cartItems = cookieData['cartItems']
+		order = cookieData['order']
+		items = cookieData['items']
 
 	context = {'items':items, 'order':order, 'cartItems':cartItems}
 	return render(request, 'store/cart.html', context)
@@ -45,9 +46,10 @@ def checkout(request):
 		cartItems = order.get_cart_items
 	else:
 		#Create empty cart for now for non-logged in user
-		items = []
-		order = {'get_cart_total':0, 'get_cart_items':0, 'shipping':False}
-		cartItems = order['get_cart_items']
+		cookieData = cookieCart(request)
+		cartItems = cookieData['cartItems']
+		order = cookieData['order']
+		items = cookieData['items']
 
 	context = {'items':items, 'order':order, 'cartItems':cartItems}
 	return render(request, 'store/checkout.html', context)
@@ -77,21 +79,21 @@ def updateItem(request):
 
 	return JsonResponse('Item was added', safe=False)
 
-def processOrder(request): # This function is used to process the order
+def processOrder(request):
 	transaction_id = datetime.datetime.now().timestamp()
 	data = json.loads(request.body)
 
-	if request.user.is_authenticated: # If the user is authenticated, then we will get the customer and order details
+	if request.user.is_authenticated:
 		customer = request.user.customer
 		order, created = Order.objects.get_or_create(customer=customer, complete=False)
 		total = float(data['form']['total'])
 		order.transaction_id = transaction_id
 
-		if total == order.get_cart_total: # If the total amount is equal to the cart total, then we will mark the order as complete
+		if total == order.get_cart_total:
 			order.complete = True
 		order.save()
 
-		if order.shipping == True: # If the shipping is true, then we will create a shipping address
+		if order.shipping == True:
 			ShippingAddress.objects.create(
 			customer=customer,
 			order=order,
@@ -104,6 +106,3 @@ def processOrder(request): # This function is used to process the order
 		print('User is not logged in')
 
 	return JsonResponse('Payment submitted..', safe=False)
-	# We will return a JSON response with the message "Payment submitted".
-	# JSONResponse is used to return a JSON response from the view.
-	# The safe parameter is set to False, which means that any object can be passed to the JsonResponse.

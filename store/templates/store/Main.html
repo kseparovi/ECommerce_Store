@@ -54,9 +54,8 @@
 		if (cart == undefined){
 			cart = {}
 			console.log('Cart Created!', cart)
-			document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/" 
-            // This is used to create a cookie with the name 'cart' and the value of the cart object
-		}   //stringify converts the object to a string
+			document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+		}
 		console.log('Cart:', cart)
 	
 	</script>
@@ -106,4 +105,4 @@
 
 	<script type="text/javascript" src="{% static 'js/cart.js' %}"></script>
 </body>
-</html> 
+</html>

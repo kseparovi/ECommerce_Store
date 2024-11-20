@@ -36,7 +36,7 @@ function updateUserOrder(productId, action){
 		});
 }
 
-function addCookieItem(productId, action){ //function to add items to cart when user is not authenticated (cookie)
+function addCookieItem(productId, action){
 	console.log('User is not authenticated')
 
 	if (action == 'add'){
@@ -59,5 +59,5 @@ function addCookieItem(productId, action){ //function to add items to cart when 
 	console.log('CART:', cart)
 	document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
 
-	location.reload()
+	//location.reload()
 }
