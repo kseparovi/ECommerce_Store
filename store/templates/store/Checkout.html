@@ -30,7 +30,9 @@
 						<div class="form-field">
 							<input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
 						</div>
-						 
+						<div class="form-field">
+							<input class="form-control" type="text" name="country" placeholder="Zip code..">
+						</div>
 					</div>
 
 					<hr>
@@ -65,14 +67,8 @@
 			</div>
 		</div>
 	</div>
-    
-    
-    
-    
-    <!-- This script is used to handle the form submission and the payment button -->
-    
 
-	<script type="text/javascript"> // This script is used to handle the form submission and the payment button
+	<script type="text/javascript">
 		var shipping = '{{order.shipping}}'
 		var total = '{{order.get_cart_total|floatformat:2}}'
 
@@ -85,9 +81,9 @@
 		 }
 
 		if (shipping == 'False' && user != 'AnonymousUser'){
-			
+			//Hide entire form if user is logged in and shipping is false
 				document.getElementById('form-wrapper').classList.add("hidden");
-				
+				//Show payment if logged in user wants to buy an item that does not require shipping
 			    document.getElementById('payment-info').classList.remove("hidden");
 		}
 
@@ -99,14 +95,12 @@
 	    	document.getElementById('payment-info').classList.remove("hidden");
 	    })
 
-	    document.getElementById('make-payment').addEventListener('click', function(e){ 
-            <!-- This function is called when the user clicks the payment button -->
+	    document.getElementById('make-payment').addEventListener('click', function(e){
 	    	submitFormData()
 	    })
 
 	    function submitFormData(){
-	    	console.log('Payment button clicked') 
-            
+	    	console.log('Payment button clicked')
 
 	    	var userFormData = {
 				'name':null,
@@ -121,14 +115,14 @@
 				'zipcode':null,
 			}
 
-			if (shipping != 'False'){ // If the user is logged in and the shipping is required
+			if (shipping != 'False'){
 	    		shippingInfo.address = form.address.value
 		    	shippingInfo.city = form.city.value
 		    	shippingInfo.state = form.state.value
 		    	shippingInfo.zipcode = form.zipcode.value
 	    	}
 
-	    	if (user == 'AnonymousUser'){ // If the user is not logged in
+	    	if (user == 'AnonymousUser'){
 	    		userFormData.name = form.name.value
 	    		userFormData.email = form.email.value
 	    	}
@@ -136,21 +130,25 @@
 	    	console.log('Shipping Info:', shippingInfo)
 	    	console.log('User Info:', userFormData)
 
-	    	var url = "/process_order/" // This is the URL that the form data will be sent to
+	    	var url = "/process_order/"
 	    	fetch(url, {
-	    		method:'POST', // This is a POST request that will send the data to the server
+	    		method:'POST',
 	    		headers:{
-	    			'Content-Type':'applicaiton/json', // This is the content type of the data that will be sent
-	    			'X-CSRFToken':csrftoken, // This is the CSRF token that was retrieved from the cookie in the Main.html file
+	    			'Content-Type':'applicaiton/json',
+	    			'X-CSRFToken':csrftoken,
 	    		}, 
-	    		body:JSON.stringify({'form':userFormData, 'shipping':shippingInfo}), //this is used to send the data to the server
+	    		body:JSON.stringify({'form':userFormData, 'shipping':shippingInfo}),
 	    		
 	    	})
-	    	.then((response) => response.json()) // This is used to convert the response from the server to a JSON object
+	    	.then((response) => response.json())
 	    	.then((data) => {
-				  console.log('Success:', data); // This is used to log the response from the server to the console
-				  alert('Transaction completed');  
-				  window.location.href = "{% url 'store' %}" // This is used to redirect the user to the store page WHEN the transaction is completed
+				console.log('Success:', data);
+				alert('Transaction completed');  
+
+				cart = {}
+				document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+
+				window.location.href = "{% url 'store' %}"
 
 				})
 	    }
